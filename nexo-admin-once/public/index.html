@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BSV Crowdfunding Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
+    .wallet-status {
+      flex-shrink: 0;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .status-icon {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .status-badge.connected {
+      background: #d1fae5;
+      color: #065f46;
+      border: 2px solid #10b981;
+    }
+
+    .status-badge.disconnected {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #ef4444;
+    }
+
+    .status-badge.clickable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .status-badge.clickable:hover {
+      opacity: 0.8;
+      transform: translateY(-1px);
+    }
+
+    .status-badge.clickable:active {
+      transform: translateY(0);
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .status-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .stat-label {
+      color: #666;
+    }
+
+    .stat-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background: #e0e0e0;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .complete-badge {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>BSV Crowdfunding Demo</h1>
+        <p class="subtitle">Workshop Demo - Pay with BSV Wallet and receive PushDrop tokens when goal is reached</p>
+      </div>
+      <div class="wallet-status">
+        <div class="status-badge disconnected clickable" id="walletStatusBadge" onclick="connectWallet()" title="Click to connect wallet">
+          <span class="status-icon">✕</span>
+          <span id="walletStatusText">Click to Connect</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="crowdfundingContent" style="display: none;">
+      <div class="status-card">
+        <div class="stat">
+          <span class="stat-label">Goal:</span>
+          <span class="stat-value" id="goal">Loading...</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Raised:</span>
+          <span class="stat-value" id="raised">Loading...</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Investors:</span>
+          <span class="stat-value" id="investors">Loading...</span>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress">0%</div>
+        </div>
+
+        <div class="stat">
+          <span class="stat-label">Status:</span>
+          <span class="stat-value" id="status">Active</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="amount">Investment Amount (satoshis)</label>
+        <input type="number" id="amount" placeholder="Enter amount" min="1" value="1000">
+      </div>
+
+      <button class="btn btn-primary" id="investBtn" onclick="invest()">
+        Invest with BSV Wallet
+      </button>
+
+      <button class="btn btn-success" id="completeBtn" onclick="complete()" style="display: none;">
+        Complete & Distribute Tokens
+      </button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script src="https://unpkg.com/@bsv/sdk@1.8.11/dist/umd/bsv-sdk.min.js"></script>
+  <script>
+    const { WalletClient, P2PKH, PublicKey, Utils } = window.bsvSdk
+    const brc29ProtocolID = [2, '3241645161d8']
+    let wallet = null
+    let backendIdentityKey = null
+
+    async function initWallet() {
+      try {
+        wallet = new WalletClient('json-api', 'localhost')
+        await wallet.connectToSubstrate()
+
+        // Get backend wallet info
+        const response = await fetch('/wallet-info')
+        const data = await response.json()
+        backendIdentityKey = data.identityKey
+
+        updateWalletBadge(true)
+        console.log('Wallet connected')
+        showMessage('Wallet connected successfully!', 'success')
+      } catch (error) {
+        console.error('Wallet connection error:', error)
+        showMessage('Please make sure BSV Desktop Wallet is running', 'error')
+        updateWalletBadge(false)
+      }
+    }
+
+    function updateWalletBadge(connected) {
+      const badge = document.getElementById('walletStatusBadge')
+      const statusText = document.getElementById('walletStatusText')
+      const statusIcon = badge.querySelector('.status-icon')
+      const content = document.getElementById('crowdfundingContent')
+
+      if (connected) {
+        badge.classList.remove('disconnected', 'clickable')
+        badge.classList.add('connected')
+        badge.removeAttribute('onclick')
+        badge.removeAttribute('title')
+        statusIcon.textContent = '✓'
+        statusText.textContent = 'Wallet Connected'
+        content.style.display = 'block'
+      } else {
+        badge.classList.remove('connected')
+        badge.classList.add('disconnected', 'clickable')
+        badge.setAttribute('onclick', 'connectWallet()')
+        badge.setAttribute('title', 'Click to connect wallet')
+        statusIcon.textContent = '✕'
+        statusText.textContent = 'Click to Connect'
+        content.style.display = 'none'
+      }
+
+      // Update button states
+      updateButtonStates()
+    }
+
+    function updateButtonStates() {
+      const investBtn = document.getElementById('investBtn')
+      if (investBtn) {
+        investBtn.disabled = false
+        investBtn.textContent = 'Invest with BSV Wallet'
+      }
+    }
+
+    window.connectWallet = async function() {
+      const statusText = document.getElementById('walletStatusText')
+      statusText.textContent = 'Connecting...'
+      await initWallet()
+    }
+
+    async function loadStatus() {
+      const response = await fetch('/status')
+      const data = await response.json()
+
+      document.getElementById('goal').textContent = data.goal + ' sats'
+      document.getElementById('raised').textContent = data.raised + ' sats'
+      document.getElementById('investors').textContent = data.investorCount
+      document.getElementById('progress').style.width = data.percentFunded + '%'
+      document.getElementById('progress').textContent = data.percentFunded + '%'
+
+      if (data.isComplete) {
+        document.getElementById('status').innerHTML = 'Complete <span class="complete-badge">FUNDED</span>'
+        document.getElementById('investBtn').disabled = true
+        document.getElementById('completeBtn').style.display = 'none'
+      } else if (data.raised >= data.goal) {
+        document.getElementById('completeBtn').style.display = 'block'
+      }
+    }
+
+    window.invest = async function() {
+      const amount = parseInt(document.getElementById('amount').value)
+      const btn = document.getElementById('investBtn')
+
+      if (!wallet || !backendIdentityKey) {
+        showMessage('Please connect your wallet first', 'error')
+        return
+      }
+
+      if (amount < 1) {
+        showMessage('Please enter a valid amount', 'error')
+        return
+      }
+
+      btn.disabled = true
+      btn.textContent = 'Creating payment...'
+
+      try {
+        // Generate derivation keys
+        const derivationPrefix = Utils.toBase64(Utils.toArray('crowdfunding', 'utf8'))
+        const derivationSuffix = Utils.toBase64(Utils.toArray(Date.now().toString(), 'utf8'))
+
+        // Get investor's identity key
+        const { publicKey: investorKey } = await wallet.getPublicKey({ identityKey: true })
+
+        // Get derived public key for payment to backend
+        const { publicKey: derivedPublicKey } = await wallet.getPublicKey({
+          counterparty: backendIdentityKey,
+          protocolID: brc29ProtocolID,
+          keyID: `${derivationPrefix} ${derivationSuffix}`
+        })
+
+        // Create locking script
+        const lockingScript = new P2PKH().lock(PublicKey.fromString(derivedPublicKey).toAddress()).toHex()
+
+        btn.textContent = 'Confirm in wallet...'
+
+        // Create transaction
+        const result = await wallet.createAction({
+          outputs: [{
+            lockingScript,
+            satoshis: amount,
+            outputDescription: 'Crowdfunding investment'
+          }],
+          description: 'Investment in crowdfunding',
+          options: {
+            randomizeOutputs: false
+          }
+        })
+
+        if (!result.tx) {
+          throw new Error('Transaction creation failed')
+        }
+
+        btn.textContent = 'Sending...'
+
+        // Send to backend
+        const response = await fetch('/invest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transaction: Utils.toBase64(result.tx),
+            amount,
+            investorKey,
+            derivationPrefix,
+            derivationSuffix
+          })
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          showMessage(`Investment successful! ${data.amount} sats sent.`, 'success')
+          await loadStatus()
+        } else {
+          showMessage(data.error || 'Investment failed', 'error')
+        }
+      } catch (error) {
+        console.error('Investment error:', error)
+        showMessage('Error: ' + error.message, 'error')
+      } finally {
+        updateButtonStates()
+      }
+    }
+
+    window.complete = async function() {
+      const btn = document.getElementById('completeBtn')
+      btn.disabled = true
+      btn.textContent = 'Distributing tokens...'
+
+      try {
+        const response = await fetch('/complete', {
+          method: 'POST'
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          showMessage(`Success! Tokens distributed to ${data.investorCount} investors. TX: ${data.txid}`, 'success')
+          await loadStatus()
+        } else {
+          showMessage(data.error || 'Failed to complete', 'error')
+          btn.disabled = false
+          btn.textContent = 'Complete & Distribute Tokens'
+        }
+      } catch (error) {
+        showMessage('Error: ' + error.message, 'error')
+        btn.disabled = false
+        btn.textContent = 'Complete & Distribute Tokens'
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById('message')
+      msg.textContent = text
+      msg.className = 'message show ' + type
+      setTimeout(() => msg.classList.remove('show'), 5000)
+    }
+
+    // Initialize on page load
+    initWallet()
+    loadStatus()
+    setInterval(loadStatus, 5000) // Refresh every 5 seconds
+  </script>
+</body>
+</html>

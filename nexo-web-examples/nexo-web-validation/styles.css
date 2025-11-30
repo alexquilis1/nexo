@@ -1,0 +1,236 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #ffffff;
+    color: #111827;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+
+.container {
+    max-width: 42rem;
+    width: 100%;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    display: inline-block;
+    background-color: #FFD700;
+    color: #000000;
+    font-weight: bold;
+    font-size: 2.25rem;
+    padding: 0.75rem 2rem;
+    margin-bottom: 1rem;
+}
+
+.header h1 {
+    font-size: 1.875rem;
+    font-weight: 300;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #4b5563;
+    font-size: 1rem;
+}
+
+/* Estado de Verificación - VÁLIDO */
+.status-valid {
+    background-color: #f0fdf4;
+    border: 2px solid #16a34a;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.check-icon {
+    width: 3rem;
+    height: 3rem;
+    background-color: #16a34a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.status-text h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #14532d;
+    margin-bottom: 0.25rem;
+}
+
+.status-text p {
+    color: #15803d;
+    font-size: 0.875rem;
+}
+
+/* Datos de la Persona */
+.info-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #d1d5db;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row.last {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.info-value {
+    color: #111827;
+    font-weight: 600;
+    text-align: right;
+}
+
+.info-value.expediente {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+/* Verificación Blockchain */
+.blockchain-card {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.blockchain-content {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.blockchain-icon {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.blockchain-card h4 {
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.blockchain-card p {
+    font-size: 0.875rem;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+
+.tx-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: #1d4ed8;
+    word-break: break-all;
+    margin-top: 0.5rem;
+}
+
+/* Información de Seguridad */
+.security-notice {
+    background-color: #fefce8;
+    border-left: 4px solid #FFD700;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.security-notice p {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.security-notice strong {
+    font-weight: 600;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1.5rem;
+}
+
+.footer p {
+    margin-bottom: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    body {
+        padding: 2rem 1rem;
+    }
+
+    .logo {
+        font-size: 1.875rem;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .status-text h2 {
+        font-size: 1.25rem;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-value {
+        text-align: left;
+    }
+
+    .blockchain-content {
+        flex-direction: column;
+    }
+}
